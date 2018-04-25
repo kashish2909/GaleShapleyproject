@@ -1,3 +1,4 @@
+package dsproject;
 import java.util.*;
 
 public class KashkanAlgo {
@@ -32,69 +33,88 @@ public class KashkanAlgo {
         }
         
         int flag = 0;
-
-        do{
-            flag = 0;
-            for(int i = 0;i<total_students;i++)
-            {
-                if(student[i].alloted==false){
-                    flag = 1;
+//        do{
+//            //This will help us to get outta do while
+//            flag = 0;
+//            for(int i = 0;i<total_students;i++){
+//                if(student[i].alloted==false){
+//                    flag = 1;
+//                }
+//            }
+//            if(flag==0)
+//                break;
+//            
+            //This means that now we still have students that have not been alotted any subject
+            int count = 0;
+            for(int i = 0;i<total_students;i = (i+1)%(total_students)){
+                if(count==total_students)
+                    break;
+                System.out.println("i:"+i);
+                if(student[i].subjects.isEmpty()){
+                    System.out.println("student:"+(i+1)+" - Stack is empty");
+                    continue;
                 }
-            }
-            if(flag==0)
-                break;
-            
-            
-            for(int i = 0;i<total_students && !student[i].alloted;i++){
+                if(student[i].alloted==true ){
+                    System.out.println("student["+i+"].alloted==true");
+                    continue;
+                }
+                    
+                
                 int temp = student[i].subjects.pop();
+                
+                //If there is a vaccancy in the subject 
                 if(subjects[temp-1].length<max_students){
-                    subjects[temp-1].insertSubjectList(student[i].id, student[i].cgpa);  
+                   // System.out.println("length<max_students");
+                    subjects[temp-1].insertSubjectList(student[i].id, student[i].cgpa);
+                    count++;
                     student[i].alloted=true;
                 }
+                //If there are no vacant seats then we see if the new student is better than any of the student that has been alotted the same course
                 else{
-                    System.out.println("i and temp are "+ i + temp);    //DEBUGGs
-                    if(student[i] == null){
-                        System.out.println("student[temp-1] is null");
-                    }
+                    System.out.println("subjects[temp-1].head.cgpa, student[i].cgpa "+subjects[temp-1].head.cgpa+" "+student[i].cgpa);
                     if(subjects[temp-1].head.cgpa<student[i].cgpa)
                     {   
-                        
+                        System.out.println("length IS MORE THAN max_students");
                         for(int j=0;j<student.length;j++)
                         {
-                            if(student[j].id==subjects[temp-1].head.id)
+                            if(student[j].id==subjects[temp-1].head.id){
                                 student[j].alloted=false;
-                            break;
+                                break;
+                            }
+                            
                         }
-                        Node tempnode=new Node(student[i].id,student[i].cgpa);
-                        tempnode.next=subjects[temp-1].head.next;
-                        subjects[temp-1].head=tempnode;
+                        //Changing the Linked List of Subjects
+//                        System.out.println("Changing the Linked List of Subjects");
+//                        Node tempnode=new Node(student[i].id,student[i].cgpa);
+//                        tempnode.next=subjects[temp-1].head.next;
+//                        subjects[temp-1].head=tempnode;
+                        subjects[temp-1].head = subjects[temp-1].head.next;
+                        subjects[temp-1].length = subjects[temp-1].length-1;
+                        subjects[temp-1].insertSubjectList(student[i].id,student[i].cgpa);
                         student[i].alloted=true;
                         
                     }
+                    else
+                        System.out.println("There's Already a better batch");
                 }
                
             }
             
             
-        }while(flag==1);
+//        }while(flag==1);
+        
         for(int i=0;i<total_subjects;i++)
         {
             subjects[i].printlist(subjects[i].head);
+            System.out.println("Next Subject");
         }
+//        for(int i=0;i<total_students;i++)
+//        {
+//            int tempsub=stud[i].subjects.pop();
+//            subjects[tempsub-1].insertSubjectList(stud[i].id,stud[i].cgpa);
+//            //visited condition and max students condition
+//        }
     }
-    
-    static class Node
-    {
-        int id;
-        float cgpa;
-        Node next; //make constructor
-        Node(int id,float cgpa)
-        {
-            this.id=id;
-            this.cgpa=cgpa;
-        }
-    }
-    
     static class Student{
         int id;
         float cgpa;
@@ -115,7 +135,6 @@ public class KashkanAlgo {
         }
     }
 
-    
     static class subjectList{
         int id;
         Node head=null;
@@ -123,27 +142,30 @@ public class KashkanAlgo {
         
         subjectList(int k){
             id = k;
-            length++;
+            
         }
         void printlist(Node head)
         {
             Node tempno=head;
-            while(tempno.next!=null)
+            while(tempno!=null)
             {
                 System.out.print(tempno.id+"  ");
+                tempno = tempno.next;
             }
             System.out.println();
         }
-            void insertSubjectList(int idst, float cgpa)
+    
+        void insertSubjectList(int idst, float cgpa)
             {    
                 Node new_node=new Node(idst,cgpa);
                 Node current;
- 
+                length++;
          /* Special case for head node */
                 if (head == null || head.cgpa >= new_node.cgpa)
                 {
                    new_node.next = head;
                    head = new_node;
+                   
                 }
                 else {
 
@@ -155,6 +177,9 @@ public class KashkanAlgo {
                    new_node.next = current.next;
                    current.next = new_node;
                 }
+                this.printlist(head); 
+                System.out.println("Out of The Insert function");
+                return;
             }
     }
     
@@ -186,11 +211,27 @@ public class KashkanAlgo {
     
     static Stack reverseStack(Stack s,String back){
         Stack temp = new Stack();
+        
         while(!s.isEmpty()){
             int k = s.pop();
             back = back+k;
-            temp.push(s.pop());
+            temp.push(k);
         }
         return temp;
     }
+    
+        
+    static class Node
+    {
+        int id;
+        float cgpa;
+        Node next; //make constructor
+        Node(int id,float cgpa)
+        {
+            this.id=id;
+            this.cgpa=cgpa;
+        }
+    }
 }
+
+
