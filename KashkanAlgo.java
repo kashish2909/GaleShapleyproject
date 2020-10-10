@@ -6,7 +6,7 @@ public class KashkanAlgo {
     static int total_students = 0;
     static int max_students = 0;
     static Scanner s = new Scanner(System.in);
-    
+    //good
     //static PrintStream ou = new PrintStream(new FileOutputStream("C:/Users/kashishban/Documents/dsa project/project/output.txt"));
     public static void main(String[] args) throws IOException
      {
